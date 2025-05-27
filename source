@@ -11858,35 +11858,46 @@ function kill(speaker,target,fast)
 	end
 end
 
-addcmd("handlekill", {"hkill"}, function(args, speaker)
+addcmd('handlekill', {'hkill'}, function(args, speaker)
 	if not firetouchinterest then
-		return notify("Incompatible Exploit", "Your exploit does not support this command (missing firetouchinterest)")
+		notify('Incompatible Exploit', 'Your exploit does not support this command (missing firetouchinterest)')
+		return
 	end
-	if not speaker.Character then return end
-	local tool = speaker.Character:FindFirstChildWhichIsA("Tool")
-	local handle = tool and tool:FindFirstChild("Handle")
-	if not handle then
-		return notify("Handle Kill", "You need to hold a \"Tool\" that does damage on touch. For example a common Sword tool.")
-	end
-	local range = tonumber(args[2]) or math.huge
-    if range ~= math.huge then notify("Handle Kill", ("Started!\nRadius: %s"):format(tostring(range):upper())) end
 
-	while task.wait() and speaker.Character and tool.Parent and tool.Parent == speaker.Character do
+	if not speaker.Character then
+		return
+	end
+
+	local tool = speaker.Character:FindFirstChildWhichIsA('Tool')
+	local handle = tool and tool:FindFirstChild('Handle')
+	if not handle then
+		notify('Handle Kill Aura', 'You need to be holding a physical tool for this command to work.')
+		return
+	end
+
+	local range = tonumber(args[2]) or math.huge
+
+	notify('Handle Kill', ('Started!\nRadius: %s'):format(tostring(range):upper()))
+
+	while speaker.Character and tool.Parent and tool.Parent == speaker.Character do
 		for _, plr in next, getPlayer(args[1], speaker) do
 			plr = Players[plr]
+
 			if plr ~= speaker and plr.Character then
-				local hum = plr.Character:FindFirstChildWhichIsA("Humanoid")
+				local hum = plr.Character:FindFirstChildWhichIsA('Humanoid')
 				local root = hum and getRoot(plr.Character)
 
 				if root and hum.Health > 0 and hum:GetState() ~= Enum.HumanoidStateType.Dead and speaker:DistanceFromCharacter(root.Position) <= range then
-					firetouchinterest(handle, root, 1)
-					firetouchinterest(handle, root, 0)
+					firetouchinterest(handle, root, true)
+					firetouchinterest(handle, root, false)
 				end
 			end
 		end
+
+		task.wait()
 	end
 
-	notify("Handle Kill", "Stopped!")
+	notify('Handle Kill', 'Stopped!')
 end)
 
 local hb = RunService.Heartbeat
