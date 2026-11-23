@@ -10135,6 +10135,25 @@ addcmd('unspasm',{'nospasm'},function(args, speaker)
 	SpasmAnim:Destroy()
 end)
 
+addcmd('tpose',{},function(args, speaker)
+	if not r15(speaker) then
+		execCmd("untpose")
+		local KAnim = Instance.new("Animation")
+        KAnim.AnimationId = "rbxassetid://27432691"
+        kposer = game:GetService("Players").LocalPlayer.Character.Humanoid:LoadAnimation(KAnim)
+    	kposer:Play()
+        kposer:AdjustSpeed(1)
+        task.wait(1.46)
+        kposer:AdjustSpeed(0)
+	else
+		notify('R6 Required','This command requires the r6 rig type')
+	end
+end)
+
+addcmd('untpose',{},function(args, speaker)
+	if kposer then kposer:Stop() kposer:Destroy() end
+end)
+
 addcmd('headthrow',{},function(args, speaker)
 	if not r15(speaker) then
 		local AnimationId = "35154961"
