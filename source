@@ -10575,17 +10575,33 @@ end)
 
 addcmd("clrconsole", {"clearconsole"}, function(args, speaker)
 	local dev_console = COREGUI:FindFirstChild("DevConsoleMaster")
-	local client_log = dev_console and dev_console:FindFirstChild("ClientLog", true)
-
-	if not client_log then
-		return "Open console at least once and make sure it is on the Client tab."
+	if not dev_console then
+		return notify("Console", "Open the developer console (/console) at least once first.")
 	end
 
-	for _, v in ipairs(client_log:GetChildren()) do
-		if tonumber(v.Name) then
-			v:Destroy()
+	local log_container = dev_console:FindFirstChild("ClientLog", true)
+	if not log_container then
+		for _, desc in ipairs(dev_console:GetDescendants()) do
+			if desc:IsA("ScrollingFrame") and (desc.Name:lower():find("log") or desc.Parent.Name:lower():find("log")) then
+				log_container = desc
+				break
+			end
 		end
 	end
+
+	if not log_container then
+		return notify("Console", "Could not find log container. Make sure you are on the Log/Client tab.")
+	end
+
+	local cleared = 0
+	for _, v in ipairs(log_container:GetChildren()) do
+		if not v:IsA("UILayout") and not v:IsA("UIPadding") and not v:IsA("UIConstraint") then
+			v:Destroy()
+			cleared += 1
+		end
+	end
+
+	notify("Console", "Cleared " .. cleared .. " console entries.")
 end)
 
 addcmd('oldconsole',{},function(args, speaker)
