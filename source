@@ -7850,7 +7850,7 @@ addcmd('walktowaypoint',{'wtwp'},function(args, speaker)
 	if not pwork then return notify("Waypoint Error", "Failed to move to waypoint.") end	
 end)
 
-addcmd('pathfindwalktowaypoint',{'pathfindwalktowp'},function(args, speaker)
+addcmd('pathfindwalktowaypoint',{'pathfindwalktowp', 'pfwtwp'},function(args, speaker)
 	local WPName = tostring(getstring(1, args))
 	local pwork = waypointmover(WPName, "pathfind", speaker)
 	if not pwork then return notify("Waypoint Error", "Failed to move to waypoint.") end	
