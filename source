@@ -12204,35 +12204,46 @@ addcmd('restorelighting',{'rlighting'},function(args, speaker)
 end)
 
 addcmd('stun',{'platformstand'},function(args, speaker)
-	speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
+	if not speaker.Character or not speaker.Character:FindFirstChildWhichIsA('Humanoid') then return end
+	speaker.Character:FindFirstChildWhichIsA('Humanoid').PlatformStand = true
 end)
 
 addcmd('unstun',{'nostun','unplatformstand','noplatformstand'},function(args, speaker)
-	speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+	if not speaker.Character or not speaker.Character:FindFirstChildWhichIsA('Humanoid') then return end
+	speaker.Character:FindFirstChildWhichIsA('Humanoid').PlatformStand = false
 end)
 
 addcmd('norotate',{'noautorotate'},function(args, speaker)
-	speaker.Character:FindFirstChildOfClass('Humanoid').AutoRotate  = false
+	if not speaker.Character or not speaker.Character:FindFirstChildWhichIsA('Humanoid') then return end
+	speaker.Character:FindFirstChildWhichIsA('Humanoid').AutoRotate = false
 end)
 
 addcmd('unnorotate',{'autorotate'},function(args, speaker)
-	speaker.Character:FindFirstChildOfClass('Humanoid').AutoRotate  = true
+	if not speaker.Character or not speaker.Character:FindFirstChildWhichIsA('Humanoid') then return end
+	speaker.Character:FindFirstChildWhichIsA('Humanoid').AutoRotate = true
 end)
 
+function state_change(st, endis, speaker)
+	pcall(function()
+		if not tonumber(st) then
+			st = Enum.HumanoidStateType[st]
+		end
+		if speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid") then
+			speaker.Character:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(st, endis)
+		end
+	end)
+end
+
 addcmd('enablestate',{},function(args, speaker)
-	local x = args[1]
-	if not tonumber(x) then
-		local x = Enum.HumanoidStateType[args[1]]
+	if args[1] then
+		state_change(args[1], true, speaker)
 	end
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(x, true)
 end)
 
 addcmd('disablestate',{},function(args, speaker)
-	local x = args[1]
-	if not tonumber(x) then
-		local x = Enum.HumanoidStateType[args[1]]
+	if args[1] then
+		state_change(args[1], false, speaker)
 	end
-	speaker.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(x, false)
 end)
 
 addcmd('drophats',{'drophat'},function(args, speaker)
