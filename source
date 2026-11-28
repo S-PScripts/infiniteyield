@@ -10567,15 +10567,19 @@ addcmd('animspeed',{},function(args, speaker)
 end)
 
 addcmd('copyanimation',{'copyanim','copyemote'},function(args, speaker)
-	local players = getPlayer(args[1], speaker)
-	for _,v in ipairs(players)do
-		local char = Players[v].Character
-		for _, v1 in pairs(speaker.Character:FindFirstChildOfClass('Humanoid'):GetPlayingAnimationTracks()) do
+	local Humanoid = speaker.Character and speaker.Character:FindFirstChildWhichIsA('Humanoid')
+	if not Humanoid then return end
+	local caiplrc = getPlayer(args[1], speaker)[1]
+	local caiplr = caiplrc and Players:FindFirstChild(caiplrc)
+	if caiplr then
+		local caiHumanoid = caiplr.Character and caiplr.Character:FindFirstChildWhichIsA('Humanoid')
+		if not caiHumanoid then return end
+		for _, v1 in pairs(Humanoid:GetPlayingAnimationTracks()) do
 			v1:Stop()
 		end
-		for _, v1 in pairs(Players[v].Character:FindFirstChildOfClass('Humanoid'):GetPlayingAnimationTracks()) do
-			if not string.find(v1.Animation.AnimationId, "507768375") then
-				local ANIM = speaker.Character:FindFirstChildOfClass('Humanoid'):LoadAnimation(v1.Animation)
+		for _, v1 in pairs(caiHumanoid:GetPlayingAnimationTracks()) do
+			if not string.find(v1.Animation.AnimationId, "507768375") and not string.find(v1.Animation.AnimationId, "180435571") then
+				local ANIM = Humanoid:LoadAnimation(v1.Animation)
 				ANIM:Play(.1, 1, v1.Speed)
 				ANIM.TimePosition = v1.TimePosition
 				task.spawn(function()
@@ -10590,9 +10594,10 @@ end)
 
 addcmd("copyanimationid", {"copyanimid", "copyemoteid"}, function(args, speaker)
 	local copyAnimId = function(player)
-		local found = "Animations Copied"
-
-		for _, v in pairs(player.Character:FindFirstChildWhichIsA("Humanoid"):GetPlayingAnimationTracks()) do
+		local found = ""
+		local Humanoid = player.Character and player.Character:FindFirstChildWhichIsA("Humanoid")
+		if not Humanoid then return end
+		for _, v in pairs(Humanoid:GetPlayingAnimationTracks()) do
 			local animationId = v.Animation.AnimationId
 			local assetId = animationId:find("rbxassetid://") and animationId:match("%d+")
 
@@ -10609,18 +10614,21 @@ addcmd("copyanimationid", {"copyanimid", "copyemoteid"}, function(args, speaker)
 			end
 		end
 
-		if found ~= "Animations Copied" then
+		if found ~= "" then
 			toClipboard(found)
 		else
 			notify("Animations", "No animations to copy")
 		end
 	end
 
+
+	local caiplr = speaker
 	if args[1] then
-		copyAnimId(Players[getPlayer(args[1], speaker)[1]])
-	else
-		copyAnimId(speaker)
+		local caiplrc = getPlayer(args[1], speaker)[1]
+		caiplr = caiplrc and Players:FindFirstChild(caiplrc)
 	end
+
+	if caiplr then copyAnimId(caiplr) end
 end)
 
 addcmd('stopanimations', {'stopanims', 'stopanim'}, function(args, speaker)
